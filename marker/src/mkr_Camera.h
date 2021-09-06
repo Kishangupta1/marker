@@ -1,0 +1,95 @@
+#ifndef MKR_CAMERA_H
+#define MKR_CAMERA_H
+
+#include <vector>
+#include <opencv2/core.hpp>
+
+namespace mkr
+{
+  // Forward declarations
+  class Chessboard;
+  class ChessboardCorners;
+  class Charucoboard;
+  class CharucoboardCorners;
+  
+  class Camera
+  {
+  public:
+    //! Default constructor.
+    Camera();
+    
+    // Construction from a file
+    Camera(const cv::String xmlfile);
+    
+    // Copy constructor
+    Camera(const Camera& obj);
+    
+    // Destructor
+    virtual ~Camera();
+    
+    // Query if camera has been calibrated
+    inline bool IsCalibrated() const
+    { return _isCalibrated; }
+    
+    // Main functionality:
+    // calibrate this camera from a given calibration file
+    void Calibrate(const Chessboard& cb,
+    	   ChessboardCorners& corners);
+
+    // Main functionality:
+    // calibrate this camera from a given set of charuco board images
+    void Calibrate(const Charucoboard& charu, const cv::String xmlfile, CharucoboardCorners& corners);
+
+		   
+    // Computes the error in calibration
+    double ComputeCalibrationError(const ChessboardCorners& corners) const;
+
+    // Computes the error in calibration
+    double ComputeCalibrationError(const CharucoboardCorners& corners) const;
+    
+    // Returns the image size
+    const cv::Size& GetImageSize() const;
+    
+    // Returns the camera matrix
+    const cv::Mat& GetCameraMatrix() const;
+    
+    // Returns the distortion coefficients
+    const cv::Mat& GetDistortionCoeffs() const;
+    
+    
+    // Returns the camera matrix and distortion coefficients
+    void GetIntrinsics(cv::Mat& camMatrix,
+		       cv::Mat& distCoeffs) const;
+
+    // Set the camera matrix and distortion coefficients
+    void SetIntrinsics(const cv::Mat camMatrix,
+		       const cv::Mat distCoeffs,
+		       const cv::Size imgSize);
+    
+    // Undistorts given image using calibrated parameters
+    void Undistort(const cv::Mat& img_in, cv::Mat& img_out) const;
+
+    // Undistorts given image using calibrated parameters
+    void Undistort(const cv::String imgfile, cv::Mat& img_out) const;
+    
+    // Print camera details to file
+    void Save(const cv::String filename) const;
+
+    // Read camera details from file
+    void Create(const cv::String filename);
+    
+  private:
+    // Update the distortion mapping
+    void ComputeDistortionMaps();
+    
+    cv::Mat _camMatrix;
+    cv::Mat _distCoeffs;
+    cv::Size _imgSize;
+    cv::Mat _mapx, _mapy;
+    bool _isCalibrated;
+  };
+
+}
+
+#endif
+      

@@ -1,0 +1,17 @@
+SOURCES = $(wildcard *.cpp)
+OBJECTS = $(SOURCES:.cpp=.o)
+
+all: $(OBJECTS) createlib clean
+
+INCPATH = -I $(APRIL)/include
+LIBPATH =
+CFLAGS = -Wall -c -std=c++11
+
+%.o: %.cpp
+	$(CPPC) $(INCPATH) $(LIBPATH) $(CFLAGS) $<
+
+createlib:
+	ar ruvs $(APRIL)/lib/libapr.a *.o
+
+clean:
+	rm *.o
